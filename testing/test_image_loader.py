@@ -1,5 +1,5 @@
 from glob import glob
-from scripts.image_loader import image_loader
+from scripts.image_loader import image_loader as loader
 
 import unittest
 import os
@@ -25,7 +25,7 @@ class TestImageLoader(unittest.TestCase):
         for image_path in images_path:
             expected_images_array = np.append(expected_images_array, cv2.imread(image_path))
 
-        actual_images_array = image_loader(self.path)
+        actual_images_array = loader(self.path)
 
         self.assertEqual(expected_images_array.all(), actual_images_array.all())
 
