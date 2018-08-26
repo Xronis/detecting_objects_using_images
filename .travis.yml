@@ -10,7 +10,7 @@ install:
 script:
   - cd testing
   - pytest
-  - pytest run ./testing/test_image_loader.py
+  - pytest run test_image_loader.py
 
 after_success:
   - codecov
