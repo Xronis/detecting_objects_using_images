@@ -1,10 +1,10 @@
 from distutils.core import setup
 
-setup(name='Distutils',
+setup(name='testing',
       version='1.0',
-      description='Python Distribution Utilities',
-      author='Greg Ward',
-      author_email='gward@python.net',
-      url='https://www.python.org/sigs/distutils-sig/',
-      packages=['distutils', 'distutils.command']
+      description='Thesis project on object detection on images',
+      author='Panagiotidis Chronis',
+      author_email='panagiotidisxronis@gmail.com',
+      url='https://github.com/Xronis/detecting_objects_using_images',
+      packages=['testing']
       )
