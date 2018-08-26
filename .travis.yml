@@ -8,8 +8,9 @@ install:
   - pip install .
 
 script:
+  - cd ./testing
   - pytest
-  - coverage run test.py
+  - coverage run test_image_loader.py
 
 after_success:
   - codecov
