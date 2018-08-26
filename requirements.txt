@@ -1,4 +1,5 @@
 numpy
-pandas
+pytest
+pytest-cov
 opencv-python
 codecov

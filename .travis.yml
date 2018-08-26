@@ -9,7 +9,7 @@ install:
 
 script:
   - pytest
-  - coverage run ./testing/test_image_loader.py
+  - py.test run ./testing/test_image_loader.py --cov=sample.py
 
 after_success:
   - codecov
