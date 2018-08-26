@@ -8,8 +8,9 @@ install:
   - pip install .
 
 script:
+  - cd testing
   - pytest
-  - py.test run ./testing/test_image_loader.py --cov=sample.py
+  - pytest run ./testing/test_image_loader.py
 
 after_success:
   - codecov
