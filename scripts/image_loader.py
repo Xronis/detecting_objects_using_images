@@ -4,6 +4,7 @@ import os
 
 import cv2
 import numpy as np
+import pandas as pd
 
 
 class BadInputError(ValueError):
@@ -34,20 +35,20 @@ def image_loader(path):
     if not os.path.exists(path=path):
         raise NotValidPathError('NotValidPathError: The given path does not exist.')
 
-    try:
-        images_path = np.array([image for folder in os.walk(path) for image in glob(os.path.join(folder[0], '*.jpg'))])
+    images_path = np.array([image for folder in os.walk(path) for image in glob(os.path.join(folder[0], '*.jpg'))])
 
-        images_array = np.array([])
+    images_dict = {}
 
-        for image_path in images_path:
-            images_array = np.append(images_array, cv2.imread(image_path))
+    for i in range(len(images_path)):
 
-        return images_array
+        image = cv2.imread(images_path[i])
+        image = image.flatten()
+        images_dict['image_{}'.format(i)] = np.asarray(image)
 
-    except Exception as e:
-        print('Exception: {}'.format(e))
-        exit(-1)
+    return images_dict
 
 
 if __name__ == '__main__':
-    print(image_loader('..\\photos_for_test\\'))
+    images = image_loader('..\\photos_for_test\\')
+    data_frame = pd.DataFrame.from_dict(images, orient='index')
+    print(data_frame)
