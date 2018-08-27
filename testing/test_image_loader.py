@@ -18,7 +18,7 @@ class TestImageLoader(unittest.TestCase):
         self.path = '..\\photos_for_test\\'
 
     def test_image_loader_appropriate_values(self):
-        images_path = np.array([image for folder in os.walk(path) for image in glob(os.path.join(folder[0], '*.png'))])
+        images_path = np.array([image for folder in os.walk(self.path) for image in glob(os.path.join(folder[0], '*.png'))])
 
         expected_images_dict = {}
 
