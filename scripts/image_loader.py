@@ -27,12 +27,12 @@ def image_loader(path):
     :return: An array of the loaded images.
     """
 
-    # if type(path) is not str:
-    #     raise BadInputError('BadInputError: Type {} is not supported. '
-    #                         'Path should always be a str'.format(type(path)))
-    #
-    # if not os.path.exists(path=path):
-    #     raise NotValidPathError('NotValidPathError: The given path does not exist.')
+    if type(path) is not str:
+        raise BadInputError('BadInputError: Type {} is not supported. '
+                            'Path should always be a str'.format(type(path)))
+
+    if not os.path.exists(path=path):
+        raise NotValidPathError('NotValidPathError: The given path does not exist.')
 
     try:
         images_path = np.array([image for folder in os.walk(path) for image in glob(os.path.join(folder[0], '*.jpg'))])
@@ -50,4 +50,4 @@ def image_loader(path):
 
 
 if __name__ == '__main__':
-    print(image_loader('E:\Pictures\\test'))
+    print(image_loader('..\\photos_for_test\\'))
