@@ -1,6 +1,7 @@
 from glob import glob
 
 import os
+import time
 
 import cv2
 import numpy as np
@@ -35,7 +36,7 @@ def image_loader(path):
     if not os.path.exists(path=path):
         raise NotValidPathError('NotValidPathError: The given path does not exist.')
 
-    images_path = np.array([image for folder in os.walk(path) for image in glob(os.path.join(folder[0], '*.jpg'))])
+    images_path = np.array([image for folder in os.walk(path) for image in glob(os.path.join(folder[0], '*.png'))])
 
     images_dict = {}
 
@@ -43,12 +44,19 @@ def image_loader(path):
 
         image = cv2.imread(images_path[i])
         image = image.flatten()
-        images_dict['image_{}'.format(i)] = np.asarray(image)
+        image_name = images_path[i].split('\\')[-1].split('.')[0]
+
+        images_dict[image_name] = np.asarray(image)
 
     return images_dict
 
 
 if __name__ == '__main__':
+
+    start_time = time.time()
+
     images = image_loader('..\\photos_for_test\\')
     data_frame = pd.DataFrame.from_dict(images, orient='index')
+
     print(data_frame)
+    print('Execution time: {} secs'.format(time.time() - start_time))
