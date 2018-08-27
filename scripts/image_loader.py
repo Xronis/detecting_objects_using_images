@@ -56,7 +56,7 @@ if __name__ == '__main__':
     start_time = time.time()
 
     images = image_loader('..\\photos_for_test\\')
-    data_frame = pd.DataFrame.from_dict(images, orient='index')
-
-    print(data_frame)
+    # data_frame = pd.DataFrame.from_dict(images, orient='index')
+    #
+    # print(data_frame)
     print('Execution time: {} secs'.format(time.time() - start_time))
