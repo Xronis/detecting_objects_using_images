@@ -47,6 +47,7 @@ def image_loader(path):
         image_name = images_path[i].split('\\')[-1].split('.')[0]
 
         images_dict[image_name] = np.asarray(image)
+        print('Loading image {}/{}'.format(i+1, len(images_path)), end='\r')
 
     return images_dict
 
@@ -54,9 +55,5 @@ def image_loader(path):
 if __name__ == '__main__':
 
     start_time = time.time()
-
-    images = image_loader('..\\photos_for_test\\')
-    # data_frame = pd.DataFrame.from_dict(images, orient='index')
-    #
-    # print(data_frame)
+    images = image_loader('E:\Documents\KITTI\Images\\training\image_2')
     print('Execution time: {} secs'.format(time.time() - start_time))
