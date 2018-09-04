@@ -56,4 +56,15 @@ if __name__ == '__main__':
 
     start_time = time.time()
     images = image_loader('E:\Documents\KITTI\Images\\training\image_2')
+
+    max_shape_key = min_shape_key = '000000'
+
+    for key, value in images.items():
+        min_shape_key = key if np.shape(value) < np.shape(images[min_shape_key]) else min_shape_key
+        max_shape_key = key if np.shape(value) > np.shape(images[max_shape_key]) else max_shape_key
+
+    print('Min: {}'.format(np.shape(images[min_shape_key])))
+    print('Max: {}'.format(np.shape(images[max_shape_key])))
+
+    # df = pd.DataFrame.from_dict(sub_images)
     print('Execution time: {} secs'.format(time.time() - start_time))
