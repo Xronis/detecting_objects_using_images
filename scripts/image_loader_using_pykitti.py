@@ -26,7 +26,7 @@ def _load_images(basedir, date, drive):
     # dataset.velo:          Returns a generator that loads velodyne scans as [x,y,z,reflectance]
     # dataset.get_velo(idx): Returns the velodyne scan at idx
 
-    return data.get_cam2(1)
+    return [image for image in data.cam2]
 
 
 def load_images(date='2011_09_26', basedir='E:\Documents\KITTI\Raw'):
@@ -37,7 +37,7 @@ def load_images(date='2011_09_26', basedir='E:\Documents\KITTI\Raw'):
 
     for drive in drives:
         drive = drive.split('_')[-2]
-        images.append(_load_images(basedir, date, drive))
+        images += _load_images(basedir, date, drive)
 
     return images
 
