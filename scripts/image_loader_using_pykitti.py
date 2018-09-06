@@ -45,10 +45,13 @@ def load_images(date='2011_09_26', basedir='E:\Documents\KITTI\Raw'):
 if __name__ == '__main__':
 
     start_time = time.time()
-    images = load_images()
+    images = load_images(basedir='C:\\Users\\ppanagiotidis\\Pictures\\Raw')
 
-    for image in images:
-        image.show()
-        time.sleep(3)
+    images_nparray = [np.array(image) for image in images]
+
+    for image in images_nparray:
+        print(np.isnan(image).any())
+        # image.show()
+        # time.sleep(3)
 
     print('Execution Time: {} secs'.format(time.time() - start_time))
