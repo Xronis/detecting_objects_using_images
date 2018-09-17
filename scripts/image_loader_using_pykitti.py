@@ -89,18 +89,18 @@ if __name__ == '__main__':
     basedir = 'C:\\Users\\ppanagiotidis\\Pictures\\Raw'
     date = '2011_09_26'
 
-    folder = basedir+'\\{}'.format(date)
-    parts = [name for name in os.listdir(folder) if os.path.isdir(folder+'\\{}'.format(name))]
+    parts = [name for name in os.listdir(basedir) if os.path.isdir(basedir+'\\{}'.format(name))]
 
     for part in parts:
 
-        basedir_w_part = folder + '\\' + part
+        basedir_part_date = basedir + '\\' + part + '\\' + date
+        basedir_part = basedir + '\\' + part
 
-        drives = [name for name in os.listdir(basedir_w_part) if os.path.isdir(basedir_w_part + '\\{}'.format(name))]
+        drives = [name for name in os.listdir(basedir_part_date) if os.path.isdir(basedir_part_date + '\\{}'.format(name))]
 
         for drive in drives:
             drive = drive.split('_')[-2]
-            images = _load_images(basedir_w_part, date, drive)
+            images = _load_images(basedir_part, date, drive)
 
             for image in images:
                 print(image.shape)
