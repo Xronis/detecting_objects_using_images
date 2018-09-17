@@ -4,6 +4,7 @@ import tempfile
 
 import pykitti
 import numpy as np
+import tensorflow as tf
 
 from PIL import Image
 
@@ -27,7 +28,7 @@ def _load_images(basedir, date, drive):
     # dataset.velo:          Returns a generator that loads velodyne scans as [x,y,z,reflectance]
     # dataset.get_velo(idx): Returns the velodyne scan at idx
 
-    return [image for image in data.cam2]
+    return [np.array(image) for image in data.cam2]
 
 
 def _transfort_images_to_npy_files(temp_file, basedir, date, drive):
@@ -83,16 +84,25 @@ def transform_images(temp_file, date='2011_09_26', basedir='E:\Documents\KITTI\R
 
 if __name__ == '__main__':
 
-    temp_folder = tempfile.mkdtemp()
-
     start_time = time.time()
-    # images = load_images()
-    #
-    # for image in images:
-    #     np.save('file_{}'.format(np.random.randint(0, 100)), np.array(image))
-    #     time.sleep(3)
 
-    transform_images(temp_file=temp_folder, basedir='C:\\Users\\ppanagiotidis\\Pictures\\Raw')
+    basedir = 'C:\\Users\\ppanagiotidis\\Pictures\\Raw'
+    date = '2011_09_26'
 
-    print(temp_folder)
+    folder = basedir+'\\{}'.format(date)
+    parts = [name for name in os.listdir(folder) if os.path.isdir(folder+'\\{}'.format(name))]
+
+    for part in parts:
+
+        basedir_w_part = folder + '\\' + part
+
+        drives = [name for name in os.listdir(basedir_w_part) if os.path.isdir(basedir_w_part + '\\{}'.format(name))]
+
+        for drive in drives:
+            drive = drive.split('_')[-2]
+            images = _load_images(basedir_w_part, date, drive)
+
+            for image in images:
+                print(image.shape)
+
     print('Execution Time: {} secs'.format(time.time() - start_time))
