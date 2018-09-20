@@ -28,7 +28,20 @@ def _load_images(basedir, date, drive):
     # dataset.velo:          Returns a generator that loads velodyne scans as [x,y,z,reflectance]
     # dataset.get_velo(idx): Returns the velodyne scan at idx
 
-    return [np.array(image) for image in data.cam2]
+    return [image for image in data.cam2]
+
+
+def load_images(date='2011_09_26', basedir='E:\Documents\KITTI\Raw'):
+    folder = basedir+'\\{}'.format(date)
+    drives = [name for name in os.listdir(folder) if os.path.isdir(folder+'\\{}'.format(name))]
+
+    images = []
+
+    for drive in drives:
+        drive = drive.split('_')[-2]
+        images += _load_images(basedir, date, drive)
+
+    return images
 
 
 def _transfort_images_to_npy_files(temp_file, basedir, date, drive):
@@ -56,19 +69,6 @@ def _transfort_images_to_npy_files(temp_file, basedir, date, drive):
         np.save(temp_file_path, np.array(image))
 
 
-def load_images(date='2011_09_26', basedir='E:\Documents\KITTI\Raw'):
-    folder = basedir+'\\{}'.format(date)
-    drives = [name for name in os.listdir(folder) if os.path.isdir(folder+'\\{}'.format(name))]
-
-    images = []
-
-    for drive in drives:
-        drive = drive.split('_')[-2]
-        images += _load_images(basedir, date, drive)
-
-    return images
-
-
 def transform_images(temp_file, date='2011_09_26', basedir='E:\Documents\KITTI\Raw'):
     folder = basedir+'\\{}'.format(date)
     drives = [name for name in os.listdir(folder) if os.path.isdir(folder+'\\{}'.format(name))]
@@ -78,6 +78,13 @@ def transform_images(temp_file, date='2011_09_26', basedir='E:\Documents\KITTI\R
     for drive in drives:
         drive = drive.split('_')[-2]
         _transfort_images_to_npy_files(temp_file, basedir, date, drive)
+
+    return images
+
+
+def rotate_images(images):
+    for i in range(len(images)):
+        images[i] = images[i].rotate(2)
 
     return images
 
@@ -100,9 +107,10 @@ if __name__ == '__main__':
 
         for drive in drives:
             drive = drive.split('_')[-2]
-            images = _load_images(basedir_part, date, drive)
+            # images = np.array(_load_images(basedir_part, date, drive)) CAST IMAGES TO ND.ARRAY
+            images = rotate_images(_load_images(basedir_part, date, drive))
+        # print(np.shape(images))
 
-            for image in images:
-                print(image.shape)
+        images[0].show()
 
     print('Execution Time: {} secs'.format(time.time() - start_time))
