@@ -89,14 +89,14 @@ def rotate_images(images):
 
     return images
 
-def load_labels(part, drive='2011_09_26', basedir='E:\Documents\KITTI\Raw'):
+# def load_labels(part, drive='2011_09_26', basedir='E:\Documents\KITTI\Raw'):
 
 
 if __name__ == '__main__':
 
     start_time = time.time()
 
-    basedir = 'C:\\Users\\ppanagiotidis\\Pictures\\Raw'
+    basedir = 'E:\Documents\KITTI\Raw'
     date = '2011_09_26'
 
     parts = [name for name in os.listdir(basedir) if os.path.isdir(basedir+'\\{}'.format(name))]
