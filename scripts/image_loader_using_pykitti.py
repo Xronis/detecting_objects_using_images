@@ -1,6 +1,7 @@
 import os
 import time
 import tempfile
+import xml.etree.ElementTree
 
 import pykitti
 import numpy as np
@@ -88,6 +89,8 @@ def rotate_images(images):
 
     return images
 
+def load_labels(part, drive='2011_09_26', basedir='E:\Documents\KITTI\Raw'):
+
 
 if __name__ == '__main__':
 
@@ -109,6 +112,7 @@ if __name__ == '__main__':
             drive = drive.split('_')[-2]
             # images = np.array(_load_images(basedir_part, date, drive)) CAST IMAGES TO ND.ARRAY
             images = rotate_images(_load_images(basedir_part, date, drive))
+
         # print(np.shape(images))
 
         images[0].show()
