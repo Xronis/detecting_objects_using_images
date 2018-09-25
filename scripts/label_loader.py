@@ -9,52 +9,63 @@ def load_labels(xml_file):
 
     items = root.findall('./tracklets/item')
 
+    individual_objects = []
+
     for item in items:
 
-        object_type = item.find('./objectType')
+        object_type = item.find('./objectType').text
 
-        height = item.find('./h')
-        width = item.find('./w')
-        length = item.find('./l')
+        height = item.find('./h').text
+        width = item.find('./w').text
+        length = item.find('./l').text
 
-        first_frame = item.find('./first_frame')
+        first_frame = item.find('./first_frame').text
         poses = item.find('./poses')
-        finished = item.find('./finished')
+        finished = item.find('./finished').text
 
         individual_object = IndividualObject(object_type, height, width, length,
                                              first_frame, finished)
 
-        for i in poses.findall('./item'):
-            tx = i.find('./tx')
-            ty = i.find('./ty')
-            tz = i.find('./tz')
+        item_in_poses = poses.findall('./item')
 
-            rx = i.find('./rx')
-            ry = i.find('./ry')
-            rz = i.find('./rz')
+        for i in range(len(item_in_poses)):
+            tx = item_in_poses[i].find('./tx').text
+            ty = item_in_poses[i].find('./ty').text
+            tz = item_in_poses[i].find('./tz').text
 
-            state = i.find('./state')
+            rx = item_in_poses[i].find('./rx').text
+            ry = item_in_poses[i].find('./ry').text
+            rz = item_in_poses[i].find('./rz').text
 
-            occlusion = i.find('./occlusion')
-            occlusion_kf = i.find('./occlusion_kf')
+            state = item_in_poses[i].find('./state').text
 
-            truncation = i.find('./truncation')
+            occlusion = item_in_poses[i].find('./occlusion').text
+            occlusion_kf = item_in_poses[i].find('./occlusion_kf').text
 
-            amt_occlusion = i.find('./amt_occlusion')
-            amt_occlusion_kf = i.find('./amt_occlusion_kf')
+            truncation = item_in_poses[i].find('./truncation').text
 
-            amt_border_l = i.find('./amt_border_l')
-            amt_border_r = i.find('./amt_border_r')
-            amt_border_kf = i.find('./amt_border_kf')
+            amt_occlusion = item_in_poses[i].find('./amt_occlusion').text
+            amt_occlusion_kf = item_in_poses[i].find('./amt_occlusion_kf').text
+
+            amt_border_l = item_in_poses[i].find('./amt_border_l').text
+            amt_border_r = item_in_poses[i].find('./amt_border_r').text
+            amt_border_kf = item_in_poses[i].find('./amt_border_kf').text
 
             individual_object.add_pose(tx, ty, tz, rx, ry, rz, state,
                                        occlusion, occlusion_kf, truncation,
                                        amt_occlusion, amt_occlusion_kf,
-                                       amt_border_l, amt_border_r, amt_border_kf)
+                                       amt_border_l, amt_border_r, amt_border_kf, i)
+
+        individual_objects.append(individual_object)
+
+    return individual_objects
 
 
 def main():
-    load_labels('E:\\Documents\\KITTI\Raw\\2011_09_26\part0\\2011_09_26_drive_0001_sync\\tracklet_labels.xml')
+    individual_objects = load_labels('C:\\Users\\ppanagiotidis\\Pictures\\Raw\\part0\\2011_09_26\\2011_09_26_drive_0001_sync\\tracklet_labels.xml')
+
+    for obj in individual_objects:
+        obj.__str__()
 
 
 if __name__ == '__main__':
