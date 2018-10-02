@@ -17,6 +17,11 @@ class IndividualObject:
         self.poses.append(Pose(tx, ty, tz, rx, ry, rz, state, occlusion, occlusion_kf, truncation,
                                amt_occlusion, amt_occlusion_kf, amt_border_l, amt_border_r, amt_border_kf, frame))
 
+    def get_pose_at_frame(self, frame):
+        for pose in self.poses:
+            if pose.frame == frame:
+                return pose
+
     def __str__(self):
         print('Object Type:\t{}'.format(self.obj_type))
         print('Height:\t\t\t{}'.format(self.height))

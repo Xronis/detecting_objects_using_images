@@ -73,6 +73,17 @@ def _load_images_wrapper(basedir_part, date, drives):
     return images
 
 
+def get_poses_of_frame(labels, frame):
+    poses_of_frame = []
+
+    for label in labels:
+        pose = label.get_pose_at_frame(frame)
+        if pose:
+            poses_of_frame.append(pose)
+
+    return poses_of_frame
+
+
 if __name__ == '__main__':
 
     start_time = time.time()
@@ -91,5 +102,10 @@ if __name__ == '__main__':
 
         images = _load_images_wrapper(basedir_part, date, drives)
         labels = _load_labels(basedir_part_date)
+
+        poses_of_frame = get_poses_of_frame(labels, 1)
+
+        for pose in poses_of_frame:
+            pose.__str__()
 
     print('Execution Time: {} secs'.format(time.time() - start_time))
