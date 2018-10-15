@@ -13,7 +13,7 @@ from PIL import Image
 from scripts.label_loader import load_labels
 
 
-def _load_images(drive, basedir='E:\Documents\KITTI\Raw', date='2011_09_26'):
+def load_images(drive, basedir='E:\Documents\KITTI\Raw', date='2011_09_26'):
     # The 'frames' argument is optional - default: None, which loads the whole dataset.
     # Calibration, timestamps, and IMU data are read automatically.
     # Camera and velodyne data are available via properties that create generators
@@ -35,44 +35,6 @@ def _load_images(drive, basedir='E:\Documents\KITTI\Raw', date='2011_09_26'):
     return [image for image in data.cam2]
 
 
-def load_images(date='2011_09_26', basedir='E:\Documents\KITTI\Raw'):
-    folder = basedir+'\\{}'.format(date)
-    drives = [name for name in os.listdir(folder) if os.path.isdir(folder+'\\{}'.format(name))]
-
-    images = []
-
-    for drive in drives:
-        drive = drive.split('_')[-2]
-        images += _load_images(basedir, date, drive)
-
-    return images
-
-
-def _load_labels(basedir_part_date):
-    drives = [name for name in os.listdir(basedir_part_date) if os.path.isdir(basedir_part_date+'\\'+name)]
-    tracklet_xml_files = list(map(lambda x: basedir_part_date+'\\'+x+'\\'+'tracklet_labels.xml', drives))
-
-    objects_of_file = []
-
-    for xml_file in tracklet_xml_files:
-        objects_of_file.extend(load_labels(xml_file))
-
-    return objects_of_file
-
-
-def _load_images_wrapper(basedir_part, date, drives):
-    images = []
-
-    for drive in drives:
-        drive = drive.split('_')[-2]
-        # images = np.array(_load_images(basedir_part, date, drive)) CAST IMAGES TO ND.ARRAY
-        # images = rotate_images(_load_images(basedir_part, date, drive))
-        images.extend(_load_images(basedir=basedir_part, date=date, drive=drive))
-        print('Loaded drive '+drive)
-
-    return images
-
-
 def get_poses_of_frame(labels, frame):
     poses_of_frame = []
 
@@ -91,21 +53,18 @@ if __name__ == '__main__':
     basedir = 'E:\Documents\KITTI\Raw'
     date = '2011_09_26'
 
-    parts = [name for name in os.listdir(basedir) if os.path.isdir(basedir+'\\{}'.format(name))]
+    drives = os.listdir(basedir + '\\' + date + '\\')
+    drives = [drive for drive in drives if os.path.isdir(basedir + '\\' + date + '\\' + drive)]
 
-    for part in parts:
+    for drive in drives:
 
-        basedir_part_date = basedir + '\\' + part + '\\' + date
-        basedir_part = basedir + '\\' + part
+        clean_drive = drive.split('_')[-2]
+        images = load_images(basedir=basedir, date=date, drive=clean_drive)
 
-        drives = [name for name in os.listdir(basedir_part_date) if os.path.isdir(basedir_part_date + '\\{}'.format(name))]
+        print('Loaded drive ' + clean_drive)
+    # poses_of_frame = get_poses_of_frame(labels, 1)
 
-        images = _load_images_wrapper(basedir_part, date, drives)
-        labels = _load_labels(basedir_part_date)
-
-        poses_of_frame = get_poses_of_frame(labels, 1)
-
-        for pose in poses_of_frame:
-            pose.__str__()
+    # for pose in poses_of_frame:
+    #     pose.__str__()
 
     print('Execution Time: {} secs'.format(time.time() - start_time))
