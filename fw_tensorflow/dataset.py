@@ -70,6 +70,7 @@ class ThesisNetKittiDataset(Dataset):
             depths = np.stack(kitti_depths, axis=0)
             suppress = np.stack(kitti_suppress, axis=0)
         return images, classes, bboxes, depths, suppress
+
     class ThesisNetKittiTargetGenerator(object):
         """Thesis network target generator.
         Attributes:
@@ -97,6 +98,7 @@ class ThesisNetKittiDataset(Dataset):
             self.depth_mask = None
             self.index_matrix_x = None
             self.index_matrix_y = None
+
         def setup(self, num_classes=5, image_height=352, image_width=1216, stride=4):
             """Sets up the target generator.
             Initializes model information, target/mask size information and index matrices
@@ -106,16 +108,25 @@ class ThesisNetKittiDataset(Dataset):
                 image_width (int, optional): The (trimmed) input image width
                 stride (int, optional): The model stride
             """
+
             self.num_classes = num_classes
             self.stride = stride
+
+            # Setting the target height/width based on the image height/width and stride
             self.target_height = int(np.ceil(image_height / stride))
             self.target_width = int(np.ceil(image_width / stride))
+
+            # Initializing the index matrices
             self.index_matrix_x = np.zeros([self.target_height, self.target_width])
             self.index_matrix_y = np.zeros([self.target_height, self.target_width])
+
+            # Setting the index matrices
             for i in range(self.target_height):
                 self.index_matrix_x[i, :] = np.arange(0, image_width, self.stride)
+
             for i in range(self.target_width):
                 self.index_matrix_y[:, i] = np.arange(0, image_height, self.stride)
+
         def generate(self, objects):
             """Generates a network target from the `objects`.
             Args:
@@ -123,23 +134,30 @@ class ThesisNetKittiDataset(Dataset):
             Returns:
                 ndarray targets with classification, bounding box, depth and supression masks
             """
-            # Initialize/reset each target volume with zeros
+
+            'Initialize/reset each target volume with zeros'
             self.classification_mask = np.zeros([self.num_classes, self.target_height, self.target_width])
             self.bbox_mask = np.zeros([self.num_coords, self.target_height, self.target_width])
             self.depth_mask = np.zeros([self.num_depth, self.target_height, self.target_width])
-            # Set entire mask as background until objects are processed
+
+            'Set entire mask as background until objects are processed'
             self.classification_mask[0, :, :] = 1
+
             for obj in objects:
                 obj_class = self._get_class(obj)
                 shrink_factor = self._get_shrink_factor(obj_class)
                 mask_coords = self._get_mask_coords(obj, shrink_factor)
+
                 self._update_classification_mask(obj_class, mask_coords)
                 self._update_bbox_mask(obj.bounding_box, mask_coords)
                 self._update_depth_mask(obj.bounding_box, mask_coords)
-            # Suppress background and don't care classes
+
+            "Suppress background and dont care classes"
             suppress_mask = self._suppress_bg_dc()
+
             return np.copy(self.classification_mask), np.copy(self.bbox_mask), \
-                   np.copy(self.depth_mask), np.copy(suppress_mask)
+                np.copy(self.depth_mask), np.copy(suppress_mask)
+
         def _suppress_bg_dc(self):
             """Suppresses background and don't care classes for the bounding box and depth masks.
             Returns:
@@ -153,6 +171,7 @@ class ThesisNetKittiDataset(Dataset):
             # Suppress for depth mask
             self.depth_mask = np.multiply(self.depth_mask, suppress_mask)
             return suppress_mask
+
         def _update_classification_mask(self, obj_class, mask_coords):
             """Updates the classification target/mask.
             Sets classification mask to 1 where object resides for the specified object class (dimension),
@@ -165,6 +184,7 @@ class ThesisNetKittiDataset(Dataset):
             self.classification_mask[0, mask_coords[1]:mask_coords[3], mask_coords[0]:mask_coords[2]] = 0
             # Set classification mask where object resides
             self.classification_mask[obj_class, mask_coords[1]:mask_coords[3], mask_coords[0]:mask_coords[2]] = 1
+
         def _update_bbox_mask(self, bbox_coords, mask_coords):
             """Updates the bounding box mask.
             Sets the bounding box mask to the bounding box coordinate value where the object resides for each dim:
@@ -186,6 +206,7 @@ class ThesisNetKittiDataset(Dataset):
             self.bbox_mask[1, :] = (self.index_matrix_y - self.bbox_mask[1, :])
             self.bbox_mask[2, :] = (self.bbox_mask[2, :] - self.index_matrix_x)
             self.bbox_mask[3, :] = (self.bbox_mask[3, :] - self.index_matrix_y)
+
         def _update_depth_mask(self, bbox_coords, mask_coords):
             """Updates the depth target/mask.
             Sets depth mask to the object distance value where the object resides
@@ -197,11 +218,12 @@ class ThesisNetKittiDataset(Dataset):
             distance = np.linalg.norm(bbox_coords)
             # Set target/mask bounding box to distance value
             self.depth_mask[0, mask_coords[1]:mask_coords[3], mask_coords[0]:mask_coords[2]] = distance
+
         def _get_class(self, obj):
             """Get object class/type as integer value.
             Object classes are defined as:
                 0: Background
-                1: Don't care/Person sitting or highly occludes/truncated objects
+                1: Don't care/Person sitting or highly occluded/truncated objects
                 2: Car/Van
                 3: Pedestrian
                 4: Cyclist
@@ -210,22 +232,30 @@ class ThesisNetKittiDataset(Dataset):
             Returns:
                 An integer representation of the object class
             """
+
             object_type = obj.object_type
-            # Background class
+
+            'Background class'
             object_class = 0
+
             # Don't care classes
             if object_type in ['DontCare', 'Person_sitting'] or obj.truncation > 0.75 or obj.occlusion > 1:
                 object_class = 1
+
             # Vehicle classes
             elif object_type in ['Car', 'Van']:
                 object_class = 2
+
             # Pedestrian class
-            elif object_type in ['Pedestrian']:
+            elif object_type in ['Pedestrian']:     # TODO: Consider change this with ==
                 object_class = 3
+
             # Cyclist class
-            elif object_type in ['Cyclist']:
+            elif object_type in ['Cyclist']:     # TODO: Consider change this with ==
                 object_class = 4
+
             return object_class
+
         def _get_shrink_factor(self, obj_class):
             """Get shrink factor 0.2 for don't care classes, otherwise 0.5.
             Args:
@@ -234,6 +264,7 @@ class ThesisNetKittiDataset(Dataset):
                 The shrink factor
             """
             return 0.5 if obj_class == 1 else 0.2
+
         def _get_mask_coords(self, obj, shrink_factor):
             """Get bounding box coordinates mapped to target/mask coordinates.
             Args:

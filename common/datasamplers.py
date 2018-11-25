@@ -47,7 +47,10 @@ class BatchDataSampler:
         sample = self.data_sampler.sample(self, dataset=self.dataset)
 
         if self.batch_size < len(sample):
+            # Splitting the array to sub-arrays with batch-size size
             batch = np.array_split(sample, np.arange(self.batch_size, len(sample), self.batch_size))
+
+            # Dropping the last batch if we request for it
             return batch[:-1] if self.drop_last else batch
         else:
             return None

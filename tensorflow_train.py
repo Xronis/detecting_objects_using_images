@@ -56,19 +56,24 @@ def get_model_placeholders(loader):
     """
 
     batch_size = loader.batch_size
+
     num_classes = loader.dataset.target_generator.num_classes
     num_coords = loader.dataset.target_generator.num_coords
     num_depth = loader.dataset.target_generator.num_depth
+
     target_height = loader.dataset.target_generator.target_height
     target_width = loader.dataset.target_generator.target_width
+
     image_height = loader.dataset.kitti_reader.image_height
     image_width = loader.dataset.kitti_reader.image_width
     image_channels = loader.dataset.kitti_reader.image_channels
+
     images_ph = tf.placeholder(dtype=tf.float32, shape=[batch_size, image_height, image_width, image_channels])
     classes_ph = tf.placeholder(dtype=tf.float32, shape=[batch_size, num_classes, target_height, target_width])
     bboxes_ph = tf.placeholder(dtype=tf.float32, shape=[batch_size, num_coords, target_height, target_width])
     depths_ph = tf.placeholder(dtype=tf.float32, shape=[batch_size, num_depth, target_height, target_width])
     suppress_ph = tf.placeholder(dtype=tf.float32, shape=[batch_size, target_height, target_width])
+
     return images_ph, classes_ph, bboxes_ph, depths_ph, suppress_ph
 
 
@@ -96,31 +101,41 @@ def get_loss(class_targets, class_predictions, bbox_targets, bbox_predictions, d
 
 def main():
     """Train function."""
-    batch_size = 1
+    batch_size = 5
     learning_rate = 0.0001
-    loader = get_kitti_loader(dataset_path='E:\Documents\KITTI\Images',
+    loader = get_kitti_loader(dataset_path='C:\\Users\polpan\Documents\KITTI',
                               batch_size=batch_size,
                               data_sampler=RandomDataSampler)
+
     with tf.Session() as sess:
         try:
             # Start data loader
             loader.request_start()
+
             # Step variable
             global_step = tf.Variable(0, name='global_step', trainable=False)
+
             # Get input/target placeholder
             images_ph, class_targets_ph, bbox_targets_ph, depth_targets_ph, suppress_ph = get_model_placeholders(loader)
+
             # Get model predictions
             class_predictions, bbox_predictions, depth_predictions = model.forward(images_ph, loader.dataset.target_generator.num_classes)
+
             # Get loss op
             loss = get_loss(class_targets_ph, class_predictions, bbox_targets_ph, bbox_predictions,
                             depth_targets_ph, depth_predictions)
+
             # Define optimizer
             with tf.variable_scope('adamoptim'):
+
                 optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
                 train = optimizer.minimize(loss=loss, global_step=global_step)
+
             # Define train op
             sess.run(tf.global_variables_initializer())
+
             model.restore_origin_resnet(session=sess, exclude_vars=['adamoptim'])
+
             # Run training loop
             while not loader.should_stop():
                 images, class_targets, bbox_targets, depth_targets, suppress = loader.next()
