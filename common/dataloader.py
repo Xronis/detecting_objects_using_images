@@ -18,8 +18,6 @@ class DataLoader(object):
         batch_sampler(BatchDataSampler): Sampler for batching according to the `data_sampler` scheme.
         idx_queue (Queue): Queue holding batch indices for data loading
         data_queue (Queue): Queue holding batches of data for data loading.
-        stop_event: TODO Write description
-        stop_flag (bool, optional): TODO Write description
         use_multiprocessing (bool, optional): Flag to enable multi processing.
     """
     def __init__(self, dataset, batch_size=1, epochs=1, drop_last=True, data_sampler=None, num_workers=1,
@@ -78,15 +76,20 @@ class DataLoader(object):
     def should_stop(self):
         """Checks if data loader should stop."""
         return self.stop_flag or (self.idx_queue.empty() and self.data_queue.empty())
+
     def next(self):
         """Gets the next batch of data from the data queue."""
         return None if self.stop_flag else self.data_queue.get()
+
     def _clear_queues(self):
         """Clear all enqueued content items."""
         while not self.idx_queue.empty():
             self.idx_queue.get()
+
         while not self.data_queue.empty():
             self.data_queue.get()
+
+
 def do_work(idx_queue, data_queue, dataset, stop_event):
     """Reads batches of indices and puts the corresponding data points onto the data queue."""
     while not (stop_event.is_set() or idx_queue.empty()):
